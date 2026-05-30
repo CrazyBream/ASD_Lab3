@@ -1,0 +1,59 @@
+﻿@model ASD_Lab3.PL.Models.RegisterViewModel
+@{
+    ViewData["Title"] = "Реєстрація";
+}
+
+<div class="row justify-content-center mt-4">
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0 rounded-4 p-4">
+            <div class="text-center mb-4">
+                <i class="bi bi-rocket-takeoff text-success" style="font-size: 3rem;"></i>
+                <h3 class="fw-bold mt-2">Створіть свій блог</h3>
+                <p class="text-muted">Приєднуйтесь до спільноти авторів</p>
+            </div>
+
+            <form asp-action="Register" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <div class="form-floating mb-3">
+                    <input asp-for="Username" class="form-control" id="floatingRegUser" placeholder="Логін" />
+                    <label for="floatingRegUser"><i class="bi bi-person me-1"></i> Ваш логін</label>
+                    <span asp-validation-for="Username" class="text-danger small"></span>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <input asp-for="Email" class="form-control" id="floatingEmail" placeholder="name@example.com" />
+                    <label for="floatingEmail"><i class="bi bi-envelope me-1"></i> Електронна пошта</label>
+                    <span asp-validation-for="Email" class="text-danger small"></span>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <input asp-for="Password" class="form-control" id="floatingRegPass" placeholder="Пароль" />
+                    <label for="floatingRegPass"><i class="bi bi-key me-1"></i> Пароль</label>
+                    <span asp-validation-for="Password" class="text-danger small"></span>
+                </div>
+
+                <div class="form-floating mb-4">
+                    <input asp-for="ConfirmPassword" class="form-control" id="floatingConfirmPass" placeholder="Підтвердження" />
+                    <label for="floatingConfirmPass"><i class="bi bi-check2-all me-1"></i> Повторіть пароль</label>
+                    <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                </div>
+
+                <button type="submit" class="btn btn-success w-100 rounded-pill py-2 fw-bold shadow-sm">
+                    Зареєструватися <i class="bi bi-arrow-right-circle ms-1"></i>
+                </button>
+            </form>
+
+            <div class="text-center mt-4">
+                <span class="text-muted">Вже маєте акаунт?</span>
+                <a asp-action="Login" class="text-decoration-none fw-bold text-success">Увійти</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

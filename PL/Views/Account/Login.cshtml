@@ -1,0 +1,47 @@
+﻿@model ASD_Lab3.PL.Models.LoginViewModel
+@{
+    ViewData["Title"] = "Вхід до системи";
+}
+
+<div class="row justify-content-center mt-5">
+    <div class="col-md-5">
+        <div class="card shadow-sm border-0 rounded-4 p-4">
+            <div class="text-center mb-4">
+                <i class="bi bi-person-circle text-primary" style="font-size: 3rem;"></i>
+                <h3 class="fw-bold mt-2">З поверненням!</h3>
+                <p class="text-muted">Увійдіть, щоб продовжити роботу в БлогІТ</p>
+            </div>
+
+            <form asp-action="Login" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <div class="form-floating mb-3">
+                    <input asp-for="Email" type="email" class="form-control" id="floatingEmail" placeholder="name@example.com" required />
+                    <label for="floatingEmail">Електронна пошта</label>
+                    <span asp-validation-for="Email" class="text-danger small"></span>
+                </div>
+
+                <div class="form-floating mb-4">
+                    <input asp-for="Password" class="form-control" id="floatingPassword" placeholder="Пароль" />
+                    <label for="floatingPassword"><i class="bi bi-shield-lock me-1"></i> Пароль</label>
+                    <span asp-validation-for="Password" class="text-danger small"></span>
+                </div>
+
+                <button type="submit" class="btn btn-custom w-100 rounded-pill py-2 fw-bold">
+                    Увійти <i class="bi bi-box-arrow-in-right ms-1"></i>
+                </button>
+            </form>
+
+            <div class="text-center mt-4">
+                <span class="text-muted">Ще не з нами?</span>
+                <a asp-action="Register" class="text-decoration-none fw-bold text-primary">Створити акаунт</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -1,0 +1,85 @@
+﻿@model IEnumerable<ASD_Lab3.BLL.DTO.ArticleDTO>
+
+@{
+    ViewData["Title"] = "Стрічка статей";
+    var topCategories = ViewBag.TopCategories as IEnumerable<string> ?? new List<string>();
+}
+
+<div class="container mt-4">
+
+    <div class="card shadow-sm border-0 rounded-4 p-4 mb-5 text-center bg-white" style="background: rgba(255, 255, 255, 0.9) !important; backdrop-filter: blur(10px);">
+        <h3 class="fw-bold mb-4">Знайди те, що тебе цікавить</h3>
+
+        <form method="get" asp-action="Index" class="d-flex justify-content-center gap-2 mb-4 mx-auto" style="max-width: 600px;">
+            <div class="input-group shadow-sm rounded-pill overflow-hidden">
+                <span class="input-group-text bg-light border-0 px-4"><i class="bi bi-search text-muted"></i></span>
+                <input type="text" name="query" value="@ViewBag.CurrentQuery" class="form-control border-0 bg-light" placeholder="Пошук за назвою..." style="box-shadow: none;">
+            </div>
+
+            <input type="hidden" name="category" value="@ViewBag.CurrentCategory" />
+            <button type="submit" class="btn btn-custom px-4 rounded-pill">Знайти</button>
+
+            @if (!string.IsNullOrEmpty(ViewBag.CurrentQuery) || !string.IsNullOrEmpty(ViewBag.CurrentCategory))
+            {
+                <a asp-action="Index" class="btn btn-light rounded-pill px-4 text-danger fw-bold border">Скинути</a>
+            }
+        </form>
+
+        @if (topCategories.Any())
+        {
+            <div class="mt-2">
+                <span class="text-muted fw-bold small text-uppercase me-3"><i class="bi bi-fire text-danger me-1"></i> Популярні рубрики:</span>
+                <div class="d-inline-flex flex-wrap gap-2 justify-content-center mt-2 mt-md-0">
+                    @foreach (var cat in topCategories)
+                    {
+                        var isActive = ViewBag.CurrentCategory == cat ? "bg-primary text-white" : "bg-light text-primary";
+                        <a asp-action="Index" asp-route-category="@cat" asp-route-query="@ViewBag.CurrentQuery"
+                           class="badge @isActive text-decoration-none px-3 py-2 rounded-pill shadow-sm transition-all hover-scale"
+                           style="font-size: 0.85rem; transition: transform 0.2s;">
+                            <i class="bi bi-hash"></i> @cat
+                        </a>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="row g-4">
+        @if (!Model.Any())
+        {
+            <div class="col-12 text-center py-5">
+                <i class="bi bi-emoji-frown display-1 text-muted mb-4 opacity-50"></i>
+                <h3 class="text-muted fw-bold">За вашим запитом нічого не знайдено</h3>
+                <p class="text-secondary">Спробуйте змінити ключові слова або обрати іншу рубрику.</p>
+                <a asp-action="Index" class="btn btn-outline-primary rounded-pill mt-3 px-4">Повернутися до всіх статей</a>
+            </div>
+        }
+        else
+        {
+            @foreach (var article in Model)
+            {
+                <div class="col-md-6 col-lg-4">
+                    <div class="card blog-card">
+                        <a asp-controller="Article" asp-action="Details" asp-route-id="@article.Id" class="text-decoration-none text-dark d-flex flex-column h-100">
+                            <div class="img-wrapper">
+                                <img src="@(string.IsNullOrEmpty(article.ImageUrl) ? $"https://picsum.photos/seed/{article.Id}/600/400" : article.ImageUrl)" class="card-img-top" alt="Обкладинка">
+                                <span class="author-badge"><i class="bi bi-person-circle me-1"></i> @article.AuthorName</span>
+                            </div>
+                            <div class="card-body p-4 d-flex flex-column">
+                                <div class="mb-2">
+                                    <span class="category-tag">@article.CategoryName</span>
+                                </div>
+                                <h4 class="card-title fw-bold mb-3 lh-sm">@article.Title</h4>
+
+                                <div class="d-flex justify-content-between align-items-center mt-auto border-top pt-3">
+                                    <small class="text-muted"><i class="bi bi-calendar3 me-1"></i> @article.CreatedAt.ToString("dd.MM.yyyy")</small>
+                                    <span class="text-primary fw-bold small">Читати <i class="bi bi-arrow-right"></i></span>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>

@@ -1,0 +1,139 @@
+﻿@model ASD_Lab3.BLL.DTO.UserProfileDTO
+@using System.Security.Claims
+
+@{
+    ViewData["Title"] = "Профіль: " + Model.Username;
+    var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+    bool isOwner = currentUserId != null && Model.Id.ToString() == currentUserId;
+    string avatarUrl = !string.IsNullOrEmpty(Model.AvatarUrl) ? Model.AvatarUrl : $"https://ui-avatars.com/api/?name={Model.Username}&background=random&size=200";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show">
+                    @TempData["SuccessMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show">
+                    @TempData["ErrorMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            <div id="viewMode" class="card shadow-sm border-0 rounded-4 p-4 text-center">
+                <div class="mb-4">
+                    <img src="@avatarUrl" class="rounded-circle shadow" width="150" height="150" style="object-fit: cover;" alt="Аватар">
+                </div>
+
+                <h2 class="fw-bold mb-1">@Model.Username</h2>
+                <p class="text-muted small mb-4">На сайті з @Model.RegisteredAt.ToString("dd.MM.yyyy")</p>
+
+                <div class="bg-light p-3 rounded-3 mb-4 text-start">
+                    <h6 class="fw-bold text-muted text-uppercase small">Про себе</h6>
+                    <p class="mb-0 fs-5">@(string.IsNullOrEmpty(Model.Bio) ? "Користувач ще не додав інформацію про себе." : Model.Bio)</p>
+                </div>
+
+                @if (isOwner)
+                {
+                    <div class="d-flex justify-content-center gap-3 border-top pt-4 mt-2">
+                        <button id="btnEnableEdit" class="btn btn-dark rounded-pill px-4"><i class="bi bi-pencil me-2"></i>Редагувати профіль</button>
+                        <button class="btn btn-outline-secondary rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#passwordModal"><i class="bi bi-shield-lock me-2"></i>Змінити пароль</button>
+
+                        <form asp-action="DeleteAccount" method="post" onsubmit="return confirm('УВАГА! Це назавжди видалить ваш акаунт, усі статті та коментарі. Ви впевнені?');">
+                            <button type="submit" class="btn btn-outline-danger rounded-pill px-4"><i class="bi bi-trash me-2"></i>Видалити акаунт</button>
+                        </form>
+                    </div>
+                }
+            </div>
+
+            @if (isOwner)
+            {
+                <div id="editMode" class="card shadow-sm border-0 rounded-4 p-4 d-none">
+                    <h3 class="fw-bold mb-4 text-center">Редагування профілю</h3>
+                    <form asp-action="Edit" method="post" enctype="multipart/form-data">
+                        <input type="hidden" asp-for="Id" />
+
+                        <div class="mb-4 text-center">
+                            <img src="@avatarUrl" class="rounded-circle shadow mb-3" width="100" height="100" style="object-fit: cover;" alt="Аватар">
+                            <input name="AvatarFile" type="file" class="form-control form-control-sm" accept="image/*">
+                            <div class="form-text">Завантажте нове фото</div>
+                        </div>
+
+                        <div class="form-floating mb-4">
+                            <input asp-for="Username" class="form-control fw-bold" id="editUsername" placeholder="Ім'я користувача" required minlength="3" />
+                            <label for="editUsername">Ім'я користувача</label>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label class="form-label fw-bold text-muted mb-2">Напишіть щось про себе</label>
+                            <textarea asp-for="Bio" class="form-control" rows="4" placeholder="Ваші інтереси, хобі, професія..."></textarea>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <button type="button" id="btnCancelEdit" class="btn btn-light rounded-pill px-4">Скасувати</button>
+                            <button type="submit" class="btn btn-custom rounded-pill px-5">Зберегти</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="modal fade" id="passwordModal" tabindex="-1">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content rounded-4 border-0 shadow">
+                            <div class="modal-header border-0 pb-0">
+                                <h5 class="modal-title fw-bold">Зміна паролю</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <form asp-action="ChangePassword" method="post">
+                                <div class="modal-body">
+                                    <div class="mb-3">
+                                        <label class="form-label">Старий пароль</label>
+                                        <input type="password" name="oldPassword" class="form-control bg-light" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Новий пароль</label>
+                                        <input type="password" name="newPassword" class="form-control bg-light" required minlength="6">
+                                    </div>
+                                </div>
+                                <div class="modal-footer border-0 pt-0">
+                                    <button type="button" class="btn btn-light rounded-pill" data-bs-dismiss="modal">Скасувати</button>
+                                    <button type="submit" class="btn btn-dark rounded-pill">Змінити пароль</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const btnEnableEdit = document.getElementById("btnEnableEdit");
+            const btnCancelEdit = document.getElementById("btnCancelEdit");
+            const viewMode = document.getElementById("viewMode");
+            const editMode = document.getElementById("editMode");
+
+            if (btnEnableEdit && btnCancelEdit) {
+                btnEnableEdit.addEventListener("click", function () {
+                    viewMode.classList.add("d-none");
+                    editMode.classList.remove("d-none");
+                });
+
+                btnCancelEdit.addEventListener("click", function () {
+                    editMode.classList.add("d-none");
+                    viewMode.classList.remove("d-none");
+                });
+            }
+        });
+    </script>
+}
